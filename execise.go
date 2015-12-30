@@ -1,12 +1,8 @@
 package main
 import (
-
-
-//	"golang.org/x/net/websocket"
 	"time"
 	"math/rand"
 	"net/http"
-//	"strconv"
 	"fmt"
 	"strconv"
 	"golang.org/x/net/websocket"
@@ -14,29 +10,56 @@ import (
 	"mygo02/chat"
 )
 
+
+type wsReadWriter struct {
+//	agent.ReadWriter
+	ws *websocket.Conn
+}
+
+func (w *wsReadWriter)Read(msg *string) (err error){
+	err = websocket.Message.Receive(w.ws, msg)
+	fmt.Printf("recv:%#v\n", *msg)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return
+}
+
+func (w *wsReadWriter)Write(msg string)(err error){
+	err = websocket.Message.Send(w.ws, msg)
+	fmt.Printf("send:%#v\n", msg)
+	if err != nil{
+		fmt.Println(err)
+	}
+	return
+}
+
 var accessCnt = 0
 func sendRecvServer(ws *websocket.Conn){
 	accessCnt ++
+	fmt.Printf("sendRecvBinaryServer finished, access cnt=%s\n", strconv.Itoa(accessCnt))
 
-	fmt.Printf("sendRecvServer %#v\n", ws)
+	id := `user` + strconv.Itoa(accessCnt)
+
+	rw := &wsReadWriter{ws}
+	a := chat.NewRoomAgent(agent.NewAgent(rw, id), chatroom)
+
 	for {
 		var buf string
-		// Receive receives a binary message from client, since buf is []byte.
-		err := websocket.Message.Receive(ws, &buf)
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Printf("recv:%#v\n", buf)
-		// Send sends a binary message to client, since buf is []byte.
-		err = websocket.Message.Send(ws, buf)
+		err := rw.Read(&buf)
 		if err != nil {
 			fmt.Println(err)
 			break
 		}
-		fmt.Printf("send:%#v\n", buf)
+		err = a.Handle(buf)
+		if err != nil{
+			fmt.Println(err)
+			break
+		}
 	}
-	fmt.Printf("sendRecvBinaryServer finished, access cnt=%s", strconv.Itoa(accessCnt))
 }
+
+var chatroom = chat.NewRoom()
 
 func main() {
 	seed := time.Now().UTC().UnixNano()
@@ -52,7 +75,6 @@ func main() {
 	fmt.Println(sa) //输出：[3 4 5 99 7 100]
 	fmt.Println(sb) //输出：[99 7 100 9 0]
 
-	r := chat.Room{map[string]agent.User{}}
 
 //	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 //		s := http.Server{Handler: websocket.Handler(wsHandler)}
