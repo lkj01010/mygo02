@@ -7,11 +7,18 @@ import (
 
 type Room struct {
 	agents map[string] *chatAgent
-	mu sync.Mutex
+	mu sync.RWMutex
+	broadcast chan string
 }
 
 func NewRoom() (*Room){
 	return &Room{agents: map[string]*chatAgent{}}
+}
+
+func(r *Room)Serve(){
+	for{
+
+	}
 }
 
 func(r *Room)AddUser(u *chatAgent){

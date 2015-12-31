@@ -37,7 +37,7 @@ func (w *wsReadWriter)Write(msg string)(err error){
 var accessCnt = 0
 func sendRecvServer(ws *websocket.Conn){
 	accessCnt ++
-	fmt.Printf("sendRecvBinaryServer finished, access cnt=%s\n", strconv.Itoa(accessCnt))
+	fmt.Printf("agent come, access cnt=%s\n", strconv.Itoa(accessCnt))
 
 	id := `user` + strconv.Itoa(accessCnt)
 
@@ -57,6 +57,9 @@ func sendRecvServer(ws *websocket.Conn){
 			break
 		}
 	}
+	accessCnt --
+	fmt.Printf("agent leave, access cnt=%s\n", strconv.Itoa(accessCnt))
+	chatroom.RemoveUser(a)
 }
 
 var chatroom = chat.NewRoom()

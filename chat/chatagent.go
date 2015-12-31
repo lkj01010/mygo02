@@ -27,7 +27,7 @@ func(ra *chatAgent)Write(msg string)(error){
 }
 
 func (ra *chatAgent)Handle(msg string)(err error){
-	reply := ra.Id() + `:` + msg
+	reply := ra.Id() + ":<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + msg
 
 //	err = ra.Write(reply)
 	ra.r.Receive(reply)
