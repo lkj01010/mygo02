@@ -36,6 +36,8 @@ func(r *Room)RemoveUser(u *chatAgent){
 }
 
 func(r *Room)Receive(msg string){
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	for _, v := range r.agents{
 		if err := v.Write(msg); err != nil{
 			fmt.Println(err)

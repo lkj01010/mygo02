@@ -33,6 +33,6 @@ func (a *Agent)Write(msg string)(error){
 	return a.rw.Write(msg)
 }
 
-func (a *Agent)Read(msg string)(error){
+func (a *Agent)Read(msg *string)(error){
 	return a.rw.Read(msg)
 }
